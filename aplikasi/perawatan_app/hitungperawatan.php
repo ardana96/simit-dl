@@ -15,6 +15,7 @@ $query = "SELECT * FROM pcaktif WHERE nomor=0";
 if (!empty($_GET['perangkat'])) {
     $perangkat = mysql_real_escape_string($_GET['perangkat']);
     $tahun = mysql_real_escape_string($_GET['tahun']);
+    $bulan = mysql_real_escape_string($_GET['bulan']);
     $qry	= mysql_query("SELECT nama_perangkat FROM tipe_perawatan WHERE id = $perangkat");
     $row	= mysql_fetch_array($qry); 
     $tipe = strtolower($row[0]);
@@ -63,6 +64,19 @@ if (!empty($_GET['perangkat'])) {
                     FROM 
                     scaner WHERE 1=1";
     }
+
+    else if(strtolower($tipe)  == 'ups'){
+
+    
+        $query = "SELECT id_perangkat AS idpc, user, lokasi AS lokasi, tipe AS perangkat,
+                    (SELECT COUNT(*) FROM perawatan WHERE perawatan.idpc = peripheral.id_perangkat AND  YEAR(tanggal_perawatan) = $tahun ) AND bulan = $bulan AS hitung,
+                    (SELECT tanggal_perawatan FROM perawatan WHERE perawatan.idpc = peripheral.id_perangkat AND  YEAR(tanggal_perawatan) = $tahun LIMIT 1)  AND bulan = $bulan  AS tanggal,
+                    (SELECT ket FROM ket_perawatan WHERE ket_perawatan.idpc = peripheral.id_perangkat AND bulan = $bulan  AND  tahun = $tahun LIMIT 1)   AS keterangan,
+                    (SELECT treated_by FROM ket_perawatan WHERE ket_perawatan.idpc = peripheral.id_perangkat AND bulan = $bulan  AND  tahun = $tahun  Order BY id desc LIMIT 1)  AS treated_by,
+                    (SELECT approve_by FROM ket_perawatan WHERE ket_perawatan.idpc = peripheral.id_perangkat AND bulan = $bulan  AND  tahun = $tahun LIMIT 1)  AND bulan = $bulan AS approve_by
+                    FROM 
+                    peripheral WHERE tipe = '$tipe' and 1=1 ";
+    }
     
     else {
        
@@ -83,8 +97,19 @@ if (!empty($_GET['perangkat'])) {
 
 if (!empty($_GET['bulan'])) {
     $bulan = mysql_real_escape_string($_GET['bulan']);
-    $query .= " AND bulan LIKE '%$bulan%'";
+
+    if ((strtolower($tipe) == 'ups' || strtolower($tipe) == 'server') && !empty($_GET['tahun'])) {
+        $tahun = mysql_real_escape_string($_GET['tahun']);
+        $bulan = mysql_real_escape_string($_GET['bulan']);
+        // Jika UPS atau Server, tetap tampil tetapi harus sesuai tahun
+        $query .= " AND LEFT(tgl_perawatan, 4) = '$tahun' AND (tipe = 'ups' OR tipe = 'server')";
+    } else {
+        // Jika bukan UPS atau Server, hanya gunakan filter bulan
+        $query .= " AND bulan LIKE '%$bulan%'";
+    }
 }
+
+
 
 if (!empty($_GET['namadivisi'])) {
     $namadivisi = mysql_real_escape_string($_GET['namadivisi']);

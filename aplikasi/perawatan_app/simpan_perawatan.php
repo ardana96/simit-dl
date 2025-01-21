@@ -9,7 +9,9 @@ $database = "sitdl";
 $conn = mysql_connect($server, $username, $password);
 mysql_select_db($database, $conn);
 
+
 // Mengambil data dari POST
+$bulan = $_POST['bulan']; // Ambil bulan dari request
 $idpc = $_POST['idpc'];
 $user = $_POST['user'];
 $lokasi = $_POST['lokasi'];
@@ -26,17 +28,17 @@ $approve_by = $_POST['approve_by'];
 
 
 //simpan ke tabel ket_perawatan 
-$exist_ket_perawatan = mysql_query("SELECT * FROM ket_perawatan WHERE idpc = '$idpc' AND tahun = '$tahun' AND treated_by = '$treated_by' ");
+$exist_ket_perawatan = mysql_query("SELECT * FROM ket_perawatan WHERE idpc = '$idpc' AND tahun = '$tahun' AND bulan = '$bulan' AND treated_by = '$treated_by' ");
 $exist_ket_perawatan_count = mysql_num_rows($exist_ket_perawatan);
 
 echo $exist_ket_perawatan_count;
 if($exist_ket_perawatan_count == 0){
-        $query_ket = "INSERT INTO ket_perawatan (idpc, treated_by, ket, tahun, approve_by ) 
-                VALUES ('$idpc', '$treated_by', '$keterangan', '$tahun', '$approve_by')";
+        $query_ket = "INSERT INTO ket_perawatan (idpc, treated_by, ket, tahun,bulan, approve_by ) 
+                VALUES ('$idpc', '$treated_by', '$keterangan', '$tahun', '$bulan', '$approve_by')";
                 mysql_query($query_ket, $conn);
                  
 }else{
-    $query_ket = "UPDATE ket_perawatan SET ket = '$keterangan', approve_by = '$approve_by' WHERE idpc = '$idpc' AND tahun = '$tahun' AND treated_by = '$treated_by' ";
+    $query_ket = "UPDATE ket_perawatan SET ket = '$keterangan', approve_by = '$approve_by' WHERE idpc = '$idpc' AND tahun = '$tahun' AND bulan = '$bulan' AND treated_by = '$treated_by' ";
     mysql_query($query_ket, $conn);
     
 }
@@ -44,13 +46,13 @@ if($exist_ket_perawatan_count == 0){
 if(count($selectedItems ) >0 ){
     foreach ($selectedItems as $itemId) {
         //$query_exist = "SELECT * FROM perawatan WHERE idpc = '$idpc' AND tipe_perawatan_id = '$tipe_perawatan_id' AND tipe_perawatan_item_id = '$itemId' AND YEAR(tanggal_perawatan) = '$tahun'";
-        $query_exist =  mysql_query( "SELECT id FROM perawatan WHERE idpc = '$idpc' AND tipe_perawatan_id = '$tipe_perawatan_id' AND tipe_perawatan_item_id = '$itemId' AND YEAR(tanggal_perawatan) = '$tahun' ");
+        $query_exist =  mysql_query( "SELECT id FROM perawatan WHERE idpc = '$idpc' AND tipe_perawatan_id = '$tipe_perawatan_id' AND tipe_perawatan_item_id = '$itemId' AND YEAR(tanggal_perawatan) = '$tahun' AND bulan = '$bulan' ");
         $exist_count = mysql_num_rows($query_exist);
 
         
         if($exist_count == 0){
-            $query = "INSERT INTO perawatan (idpc, tipe_perawatan_id, tipe_perawatan_item_id, tanggal_perawatan ) 
-                VALUES ('$idpc', '$tipe_perawatan_id', '$itemId', '$tanggal')";
+            $query = "INSERT INTO perawatan (idpc, tipe_perawatan_id, tipe_perawatan_item_id, tanggal_perawatan, bulan)
+                VALUES ('$idpc', '$tipe_perawatan_id', '$itemId', '$tanggal' , '$bulan')";
                 
         }else{
             continue;
@@ -66,7 +68,7 @@ if(count($unselectedItems ) >0 ){
 
     foreach ($unselectedItems as $itemId) {
         //$query_exist = "SELECT * FROM perawatan WHERE idpc = '$idpc' AND tipe_perawatan_id = '$tipe_perawatan_id' AND tipe_perawatan_item_id = '$itemId' AND YEAR(tanggal_perawatan) = '$tahun'";
-        $query_exist =  mysql_query( "SELECT id FROM perawatan WHERE idpc = '$idpc' AND tipe_perawatan_id = '$tipe_perawatan_id' AND tipe_perawatan_item_id = '$itemId' AND YEAR(tanggal_perawatan) = '$tahun' ");
+        $query_exist =  mysql_query( "SELECT id FROM perawatan WHERE idpc = '$idpc' AND tipe_perawatan_id = '$tipe_perawatan_id' AND tipe_perawatan_item_id = '$itemId' AND YEAR(tanggal_perawatan) = '$tahun' AND bulan = '$bulan' ");
         $exist_count = mysql_num_rows($query_exist);
         // $row	= mysql_fetch_array($query_exist); 
         // $idperawatan = $row[0];

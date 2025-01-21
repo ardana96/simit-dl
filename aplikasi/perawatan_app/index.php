@@ -22,25 +22,26 @@ $staffIT = $_SESSION['user'];
                     <div class="panel panel-danger">
                         <div class="panel-body">
                             <form method="GET" action="index.php">
-                                <div class="form-group" >
-                                    <b> Nama Bulan</b>        
-                                    <select class="form-control" name='bulan' required='required'>	 
+                            <div class="form-group">
+                                <b> Nama Bulan</b>        
+                                <select class="form-control" name='bulan' required='required'>	 
                                     <option> </option>
-                                            
-                                            <?	$ss = mysql_query("SELECT * FROM bulan  ");
-                                                if(mysql_num_rows($ss) > 0){
-                                            while($datass = mysql_fetch_array($ss)){
-                                                $id_bulan=$datass['id_bulan'];
-                                                $bulan=$datass['bulan'];
-                                                ?>
-                                            <option value="<? echo $id_bulan; ?>"> <? echo $bulan; ?>
-                                            </option>
-                                            
-                                            <?}}?>
-                                            
-                                    
-                                    </select> 
-                                </div>	
+                                    <?php
+                                    // Koneksi database (sesuaikan dengan konfigurasi)
+                                    $ss = mysql_query("SELECT * FROM bulan WHERE id_bulan BETWEEN '01' AND '12' ORDER BY id_bulan ASC");
+                                    if(mysql_num_rows($ss) > 0){
+                                        while($datass = mysql_fetch_array($ss)){
+                                            $id_bulan = $datass['id_bulan'];
+                                            $bulan = $datass['bulan'];
+                                            ?>
+                                            <option value="<?php echo $id_bulan; ?>"> <?php echo $bulan; ?> </option>
+                                            <?php
+                                        }
+                                    }
+                                    ?>
+                                </select> 
+                            </div>
+
 
                                 <div class="form-group" >
                                     <b> Tahun</b>        
@@ -197,6 +198,25 @@ $staffIT = $_SESSION['user'];
                             <input type="text" class="form-control" name="lokasi" id="lokasi" disabled>
                         </div>
                         </hr>
+                                                <div class="form-group">
+                            <label for="bulan">Bulan</label>
+                            <select class="form-control" name="bulan" id="bulanModul" required>
+                                <option value="">Pilih Bulan</option>
+                                <option value="01">Januari</option>
+                                <option value="02">Februari</option>
+                                <option value="03">Maret</option>
+                                <option value="04">April</option>
+                                <option value="05">Mei</option>
+                                <option value="06">Juni</option>
+                                <option value="07">Juli</option>
+                                <option value="08">Agustus</option>
+                                <option value="09">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Desember</option>
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label for="editOrderDate">Jenis Perawatan</label><br>
                             <label><input type="checkbox" id="selectAll" onclick="toggleCheckboxes(this)" unchecked> Pilih Semua</label><br>
@@ -432,7 +452,15 @@ $staffIT = $_SESSION['user'];
                         alert("Nama Perawat Tidak Ada, Silahkan Login Kembali");
                         return false; // Prevent form submission
                     }
+
+    //                 if (!bulan) {
+    //     alert("Bulan belum dipilih!");
+    //     return;
+    // }
+
+                
                 // Ambil data dari input lainnya
+                
                 const idpc = document.getElementById("idpc").value;
                 const user = document.getElementById("user").value;
                 const lokasi = document.getElementById("lokasi").value;
@@ -441,6 +469,9 @@ $staffIT = $_SESSION['user'];
                 const approve_by = document.getElementById("approve_by").value;
                 const treated_by = document.getElementById("treated_by").value;
                 const tahun = document.getElementById("tahun").value;
+                const bulan = document.getElementById("bulanModul").value;
+                //const bulan = "01";
+                console.log("Bulan yang dikirim:", bulan); // Debugging
                 console.log(selectedItems);
                 console.log(unselectedItems);
                 // Kirim data menggunakan AJAX
@@ -454,6 +485,7 @@ $staffIT = $_SESSION['user'];
                             lokasi: lokasi,
                             tipe_perawatan_id :tipe_perawatan_id,
                             tahun:tahun,
+                            bulan: bulan, // Tambahkan parameter bulan
                             keterangan:keterangan,
                             selected_items: selectedItems,
                             unselected_items : unselectedItems,
@@ -465,7 +497,7 @@ $staffIT = $_SESSION['user'];
                             //alert('Data berhasil disimpan!');
                             $('#editModal').modal('hide');// Tutup modal setelah menyimpan
                             loadData() ; 
-                            //refresh();
+                           // refresh();
                         },
                         error: function() {
                             alert('Gagal menyimpan data.');
